@@ -71,9 +71,6 @@ function crearCita() {
     // ID Unico
     citaObj.id = Date.now();
 
-    // Agregar Cita
-    administrarCitas.agregarCita({...citaObj});
-
     // Insertar Registro en DB
     insertarRegistroDB({...citaObj});
 
@@ -84,18 +81,8 @@ function crearCita() {
 // Editar la Cita
 function editarCita() {
 
-    // Guardar Cita
-    administrarCitas.editarCita({...citaObj});
-
-    // Mensaje
-    ui.imprimirAlerta('Cita guardada', 'exito');
-
-    // Editar Boton
-    const btnSubmit = formulario.querySelector('button[type="submit"]');
-    btnSubmit.textContent = 'Crear Cita';
-    btnSubmit.classList.remove('btn-info');
-
-    editando = false;
+    // Editar Cita en DB
+    editarCitaDB({...citaObj});
 
 }
 
@@ -112,14 +99,9 @@ function reiniciarObjeto() {
 
 // Eliminar la cita
 export function eliminarCita(id) {
-    // Eliminar la Cita
-    administrarCitas.eliminarCita(id);
-
-    // Muestre un mensaje
-    ui.imprimirAlerta('Cita eliminada', 'exito');
-
-    // Refrescar las citas
-    ui.imprimirCitas();
+    
+    // Elimina Cita DB
+    eliminarCitaDB(id);
 }
 
 // Cargar datos y modo edicion
@@ -170,5 +152,50 @@ function insertarRegistroDB(citaObj) {
     // Error
     transaction.onerror = function() {
         ui.imprimirAlerta('Error al agregar la cita', 'error');
+    }
+}
+
+// Editar Cita DB
+function editarCitaDB(citaObj) {
+    const transaction = db.data.transaction(['citas'], 'readwrite');
+    const objectStore = transaction.objectStore('citas');
+
+    objectStore.put(citaObj);
+
+    transaction.oncomplete = () => {
+        // Mensaje
+        ui.imprimirAlerta('Cita guardada', 'exito');
+
+        // Editar Boton
+        const btnSubmit = formulario.querySelector('button[type="submit"]');
+        btnSubmit.textContent = 'Crear Cita';
+        btnSubmit.classList.remove('btn-info');
+
+        // Modo Editar
+        editando = false;
+    }
+
+    transaction.onerror = () => {
+        ui.imprimirAlerta('Hubo un error', 'error');
+    }
+}
+
+// Eliminar CIta DB
+function eliminarCitaDB(id) {
+    const transaction = db.data.transaction(['citas'], 'readwrite');
+    const objectStore = transaction.objectStore('citas');
+
+    objectStore.delete(id);
+
+    transaction.oncomplete = () => {
+        // Muestre un mensaje
+        ui.imprimirAlerta('Cita eliminada', 'exito');
+
+        // Refrescar las citas
+        ui.imprimirCitas();
+    }
+
+    transaction.onerror = () => {
+        ui.imprimirAlerta('Hubo un error', 'error');
     }
 }
