@@ -1,5 +1,6 @@
 import Citas from './classes/Citas.js';
 import UI from './classes/UI.js';
+import DB from './classes/DB.js';
 
 import {
     mascotaInput,
@@ -8,7 +9,7 @@ import {
     fechaInput,
     horaInput,
     sintomasInput,
-    formulario,
+    formulario
 } from './selectores.js';
 
 // Variables
@@ -28,6 +29,7 @@ const citaObj = {
 // Instanciar
 const ui = new UI();
 const administrarCitas = new Citas();
+export let db = new DB();
 
 // Agregar Datos al Objeto
 export function datosCita(e) {
@@ -71,6 +73,9 @@ function crearCita() {
 
     // Agregar Cita
     administrarCitas.agregarCita({...citaObj});
+
+    // Insertar Registro en DB
+    insertarRegistroDB({...citaObj});
 
     // Mensaje
     ui.imprimirAlerta('Cita creada', 'exito');
@@ -145,4 +150,25 @@ export function cargarEdicion(cita) {
     const btnSubmit = formulario.querySelector('button[type="submit"]');
     btnSubmit.textContent = 'Guardar Cita';
     btnSubmit.classList.add('btn-info');
+}
+
+// Insertar Registro DB
+function insertarRegistroDB(citaObj) {
+    const transaction = db.data.transaction(['citas'], 'readwrite');
+
+    // Obtener objetos de almacenamiento
+    const objectStore = transaction.objectStore('citas');
+
+    // Agregar Cita DB
+    objectStore.add(citaObj);
+
+    // Si funciono bien
+    transaction.oncomplete = function() {
+        ui.imprimirAlerta('Se agrego correctamente', 'exito');
+    }
+
+    // Error
+    transaction.onerror = function() {
+        ui.imprimirAlerta('Error al agregar la cita', 'error');
+    }
 }
