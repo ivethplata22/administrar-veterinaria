@@ -1,4 +1,4 @@
-import { datosCita, nuevaCita, db } from '../funciones.js'; 
+import { datosCita, nuevaCita, db, ui } from '../funciones.js'; 
 import {
     mascotaInput,
     propietarioInput,
@@ -23,6 +23,11 @@ class App {
 
             // Crear DB
             db.crearDB();
+
+            setTimeout(() => {
+                // Cargamos Citas
+                ui.imprimirCitas();
+            }, 10);
         }
     }
 

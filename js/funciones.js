@@ -27,9 +27,9 @@ const citaObj = {
 }
 
 // Instanciar
-const ui = new UI();
+export const ui = new UI();
 const administrarCitas = new Citas();
-export let db = new DB();
+export const db = new DB();
 
 // Agregar Datos al Objeto
 export function datosCita(e) {
@@ -62,7 +62,7 @@ export function nuevaCita(e) {
     formulario.reset();
 
     // Mostrar el HTML
-    ui.imprimirCitas(administrarCitas);
+    ui.imprimirCitas();
 
 }
 
@@ -119,7 +119,7 @@ export function eliminarCita(id) {
     ui.imprimirAlerta('Cita eliminada', 'exito');
 
     // Refrescar las citas
-    ui.imprimirCitas(administrarCitas);
+    ui.imprimirCitas();
 }
 
 // Cargar datos y modo edicion
